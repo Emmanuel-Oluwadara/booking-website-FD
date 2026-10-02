@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import StudioApp from './StudioApp.jsx'
 import './App.css'
 
 const SESSION_KEY = 'heritage-hair-studio-session'
@@ -58,8 +59,21 @@ function App() {
     }
   }
 
+  function handleProfileUpdate(updatedUser) {
+    setUser(updatedUser)
+    try {
+      window.localStorage.setItem(SESSION_KEY, JSON.stringify(updatedUser))
+    } catch {
+      // The updated profile remains available until this page is closed.
+    }
+  }
+
   function handlePasswordHelp() {
     setMessage('Password reset will be available once secure account services are connected.')
+  }
+
+  if (user) {
+    return <StudioApp user={user} onLogout={handleLogout} onProfileUpdate={handleProfileUpdate} />
   }
 
   return (
@@ -92,25 +106,7 @@ function App() {
           <span className="topline-index">01 <span>/</span> 02</span>
         </header>
 
-        {user ? (
-          <section className="account-content signed-in" aria-labelledby="welcome-title">
-            <div className="account-seal" aria-hidden="true">HH</div>
-            <p className="eyebrow account-eyebrow"><span /> MEMBER ACCESS · ACTIVE</p>
-            <h2 id="welcome-title">Lovely to see you,<br /><em>{user.name.split(' ')[0]}.</em></h2>
-            <p className="form-intro">Your studio account is ready. We can’t wait to see you in the chair.</p>
-
-            <div className="profile-details">
-              <span>YOUR ACCOUNT</span>
-              <strong>{user.name}</strong>
-              <p>{user.email}</p>
-            </div>
-
-            <button className="submit-button logout-button" type="button" onClick={handleLogout}>
-              Log out <span aria-hidden="true">↗</span>
-            </button>
-          </section>
-        ) : (
-          <section className="account-content" aria-labelledby="account-title">
+        <section className="account-content" aria-labelledby="account-title">
             <p className="eyebrow account-eyebrow"><span /> YOUR STUDIO, YOUR WAY</p>
             <h2 id="account-title">
               {mode === 'signin' ? <>Your studio.<br /><em>Your time.</em></> : <>Make yourself<br /><em>at home.</em></>}
@@ -208,8 +204,7 @@ function App() {
             ) : (
               <p className="switch-prompt">Already have an account? <button type="button" onClick={() => changeMode('signin')}>Sign in</button></p>
             )}
-          </section>
-        )}
+        </section>
 
         <footer className="panel-footer">
           <span className="footer-flower" aria-hidden="true">✳</span>
